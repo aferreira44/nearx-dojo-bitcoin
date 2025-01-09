@@ -1,10 +1,8 @@
 import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
 import "./App.css";
 
 function App() {
-  const [blocks, setBlocks] = useState([
+  const [blocks, _] = useState([
     {
       id: 878413,
       hash: "0000000000000000000000000000000000000000000000000000000000000000",
