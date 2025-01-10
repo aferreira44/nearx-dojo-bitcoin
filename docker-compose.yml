@@ -19,6 +19,8 @@ services:
     build:
       context: ./server
       target: development
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
       - "8080:8080"
     volumes:
@@ -28,3 +30,6 @@ services:
       - PORT=8080
       - CGO_ENABLED=0
       - GOOS=linux
+      - BITCOIN_NODE_URL=http://host.docker.internal:18443
+      - BITCOIN_NODE_USER=polaruser
+      - BITCOIN_NODE_PASS=polarpass
