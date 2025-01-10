@@ -1,0 +1,28 @@
+# Binary files
+tmp/
+__debug_bin*
+
+# Go specific
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# IDE specific
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Environment
+.env*
+
+# Go workspace file
+go.work
+
+# Air tmp files
+tmp/ 

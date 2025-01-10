@@ -4,19 +4,27 @@ services:
   client:
     build:
       context: ./client
-      dockerfile: Dockerfile
+      target: development
     ports:
-      - "3000:80"
-    depends_on:
-      - server
+      - "5173:5173"
+    volumes:
+      - ./client:/app
+      - /app/node_modules
     environment:
       - VITE_API_URL=http://localhost:8080/query
+    depends_on:
+      - server
 
   server:
     build:
       context: ./server
-      dockerfile: Dockerfile
+      target: development
     ports:
       - "8080:8080"
+    volumes:
+      - ./server:/app
+      - /app/go
     environment:
       - PORT=8080
+      - CGO_ENABLED=0
+      - GOOS=linux

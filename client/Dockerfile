@@ -1,31 +1,45 @@
-# Build stage
-FROM node:20-alpine as builder
+# Development stage
+FROM node:20-alpine as development
 
 WORKDIR /app
+
+# Install pnpm for better performance
+RUN corepack enable && corepack prepare pnpm@latest --activate
 
 # Copy package files
 COPY package*.json ./
 
+# Create node_modules directory and set permissions
+RUN mkdir -p node_modules && chown -R node:node .
+
+# Switch to non-root user
+USER node
+
 # Install dependencies
-RUN npm install
+RUN pnpm install
 
-# Copy source code
+# Expose Vite's default port
+EXPOSE 5173
+
+# Development command
+CMD ["pnpm", "dev", "--host"]
+
+# Build stage
+FROM node:20-alpine as builder
+
+WORKDIR /app
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+COPY package*.json ./
+
+RUN pnpm install
 COPY . .
-
-# Build the application
-RUN npm run build
+RUN pnpm build
 
 # Production stage
-FROM nginx:alpine
+FROM nginx:alpine-slim as production
 
-# Copy built assets from builder stage
 COPY --from=builder /app/dist /usr/share/nginx/html
-
-# Copy nginx config if you have custom configuration
-# COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# Expose port 80
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80
-
-# Start nginx
-CMD ["nginx", "-g", "daemon off;"] 
+CMD ["nginx", "-g", "daemon off;"]

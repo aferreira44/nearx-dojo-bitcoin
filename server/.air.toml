@@ -1,0 +1,12 @@
+root = "."
+tmp_dir = "tmp"
+
+[build]
+cmd = "go build -o ./tmp/main ."
+bin = "./tmp/main"
+include_ext = ["go", "graphqls"]
+exclude_dir = ["tmp", "vendor"]
+delay = 1000
+
+[screen]
+clear_on_rebuild = true
