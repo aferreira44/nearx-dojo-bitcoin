@@ -11,6 +11,37 @@ import (
 	"server/internal/rpc"
 )
 
+// GetLatestBlocks is the resolver for the getLatestBlocks field.
+func (r *queryResolver) GetLatestBlocks(ctx context.Context, count int32) (*model.LatestBlocksResponse, error) {
+	client := rpc.NewRpcClient()
+
+	var blockchainInfoResponse struct {
+		Result struct {
+			Blocks int32 `json:"blocks"`
+		} `json:"result"`
+		Error interface{} `json:"error"`
+	}
+
+	err := client.Call("getblockchaininfo", []interface{}{}, &blockchainInfoResponse)
+	if err != nil {
+		return nil, fmt.Errorf("RPC call failed: %v", err)
+	}
+
+	latestBlockHeight := blockchainInfoResponse.Result.Blocks
+
+	var blocks []*model.Block
+
+	for i := latestBlockHeight; i > latestBlockHeight-int32(count); i-- {
+		block, err := r.GetBlockByHeight(ctx, i)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get block by height: %v", err)
+		}
+		blocks = append(blocks, block)
+	}
+
+	return &model.LatestBlocksResponse{Height: latestBlockHeight, Blocks: blocks}, nil
+}
+
 // GetBalanceByAddress is the resolver for the getBalanceByAddress field.
 func (r *queryResolver) GetBalanceByAddress(ctx context.Context, address string) (*model.BalanceResponse, error) {
 	client := rpc.NewRpcClient()
@@ -43,7 +74,7 @@ func (r *queryResolver) GetBalanceByAddress(ctx context.Context, address string)
 }
 
 // GetTransactionByTxID is the resolver for the getTransactionByTxId field.
-func (r *queryResolver) GetTransactionByTxID(ctx context.Context, txID string) (*model.TransactionResponse, error) {
+func (r *queryResolver) GetTransactionByTxID(ctx context.Context, txID string) (*model.Transaction, error) {
 	client := rpc.NewRpcClient()
 
 	var response struct {
@@ -69,11 +100,11 @@ func (r *queryResolver) GetTransactionByTxID(ctx context.Context, txID string) (
 		return nil, fmt.Errorf("RPC call failed: %v", err)
 	}
 
-	return (*model.TransactionResponse)(&response.Result), nil
+	return (*model.Transaction)(&response.Result), nil
 }
 
 // GetBlockByHeight is the resolver for the getBlockByHeight field.
-func (r *queryResolver) GetBlockByHeight(ctx context.Context, height int32) (*model.BlockResponse, error) {
+func (r *queryResolver) GetBlockByHeight(ctx context.Context, height int32) (*model.Block, error) {
 	client := rpc.NewRpcClient()
 
 	// First get the block hash for the given height
@@ -118,7 +149,7 @@ func (r *queryResolver) GetBlockByHeight(ctx context.Context, height int32) (*mo
 		return nil, fmt.Errorf("RPC call failed: %v", err)
 	}
 
-	return (*model.BlockResponse)(&blockResponse.Result), nil
+	return (*model.Block)(&blockResponse.Result), nil
 }
 
 // Query returns QueryResolver implementation.

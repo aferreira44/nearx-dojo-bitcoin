@@ -3,9 +3,15 @@
 # https://gqlgen.com/getting-started/
 
 type Query {
+  getLatestBlocks(count: Int!): LatestBlocksResponse
   getBalanceByAddress(address: String!): BalanceResponse
-  getTransactionByTxId(txId: String!): TransactionResponse
-  getBlockByHeight(height: Int!): BlockResponse
+  getTransactionByTxId(txId: String!): Transaction
+  getBlockByHeight(height: Int!): Block
+}
+
+type LatestBlocksResponse {
+  height: Int!
+  blocks: [Block!]!
 }
 
 type BalanceResponse {
@@ -13,7 +19,7 @@ type BalanceResponse {
   balance: Int!
 }
 
-type TransactionResponse {
+type Transaction {
   hex: String!
   txId: String!
   hash: String!
@@ -30,7 +36,7 @@ type TransactionResponse {
   # vout: [Vout!]!
 }
 
-type BlockResponse {
+type Block {
   hash: String!
   confirmations: Int!
   size: Int!
@@ -50,7 +56,3 @@ type BlockResponse {
   previousBlockHash: String!
   nextBlockHash: String!
 }
-
-# type Mutation {
-#   createTodo(input: NewTodo!): Todo!
-# }

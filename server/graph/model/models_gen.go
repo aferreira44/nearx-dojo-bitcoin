@@ -7,7 +7,7 @@ type BalanceResponse struct {
 	Balance int32  `json:"balance"`
 }
 
-type BlockResponse struct {
+type Block struct {
 	Hash              string  `json:"hash"`
 	Confirmations     int32   `json:"confirmations"`
 	Size              int32   `json:"size"`
@@ -28,10 +28,15 @@ type BlockResponse struct {
 	NextBlockHash     string  `json:"nextBlockHash"`
 }
 
+type LatestBlocksResponse struct {
+	Height int32    `json:"height"`
+	Blocks []*Block `json:"blocks"`
+}
+
 type Query struct {
 }
 
-type TransactionResponse struct {
+type Transaction struct {
 	Hex           string `json:"hex"`
 	TxID          string `json:"txId"`
 	Hash          string `json:"hash"`

@@ -51,7 +51,7 @@ type ComplexityRoot struct {
 		Balance func(childComplexity int) int
 	}
 
-	BlockResponse struct {
+	Block struct {
 		Bits              func(childComplexity int) int
 		Chainwork         func(childComplexity int) int
 		Confirmations     func(childComplexity int) int
@@ -72,13 +72,19 @@ type ComplexityRoot struct {
 		Weight            func(childComplexity int) int
 	}
 
+	LatestBlocksResponse struct {
+		Blocks func(childComplexity int) int
+		Height func(childComplexity int) int
+	}
+
 	Query struct {
 		GetBalanceByAddress  func(childComplexity int, address string) int
 		GetBlockByHeight     func(childComplexity int, height int32) int
+		GetLatestBlocks      func(childComplexity int, count int32) int
 		GetTransactionByTxID func(childComplexity int, txID string) int
 	}
 
-	TransactionResponse struct {
+	Transaction struct {
 		BlockHash     func(childComplexity int) int
 		BlockTime     func(childComplexity int) int
 		Confirmations func(childComplexity int) int
@@ -95,9 +101,10 @@ type ComplexityRoot struct {
 }
 
 type QueryResolver interface {
+	GetLatestBlocks(ctx context.Context, count int32) (*model.LatestBlocksResponse, error)
 	GetBalanceByAddress(ctx context.Context, address string) (*model.BalanceResponse, error)
-	GetTransactionByTxID(ctx context.Context, txID string) (*model.TransactionResponse, error)
-	GetBlockByHeight(ctx context.Context, height int32) (*model.BlockResponse, error)
+	GetTransactionByTxID(ctx context.Context, txID string) (*model.Transaction, error)
+	GetBlockByHeight(ctx context.Context, height int32) (*model.Block, error)
 }
 
 type executableSchema struct {
@@ -133,131 +140,145 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.BalanceResponse.Balance(childComplexity), true
 
-	case "BlockResponse.bits":
-		if e.complexity.BlockResponse.Bits == nil {
+	case "Block.bits":
+		if e.complexity.Block.Bits == nil {
 			break
 		}
 
-		return e.complexity.BlockResponse.Bits(childComplexity), true
+		return e.complexity.Block.Bits(childComplexity), true
 
-	case "BlockResponse.chainwork":
-		if e.complexity.BlockResponse.Chainwork == nil {
+	case "Block.chainwork":
+		if e.complexity.Block.Chainwork == nil {
 			break
 		}
 
-		return e.complexity.BlockResponse.Chainwork(childComplexity), true
+		return e.complexity.Block.Chainwork(childComplexity), true
 
-	case "BlockResponse.confirmations":
-		if e.complexity.BlockResponse.Confirmations == nil {
+	case "Block.confirmations":
+		if e.complexity.Block.Confirmations == nil {
 			break
 		}
 
-		return e.complexity.BlockResponse.Confirmations(childComplexity), true
+		return e.complexity.Block.Confirmations(childComplexity), true
 
-	case "BlockResponse.difficulty":
-		if e.complexity.BlockResponse.Difficulty == nil {
+	case "Block.difficulty":
+		if e.complexity.Block.Difficulty == nil {
 			break
 		}
 
-		return e.complexity.BlockResponse.Difficulty(childComplexity), true
+		return e.complexity.Block.Difficulty(childComplexity), true
 
-	case "BlockResponse.hash":
-		if e.complexity.BlockResponse.Hash == nil {
+	case "Block.hash":
+		if e.complexity.Block.Hash == nil {
 			break
 		}
 
-		return e.complexity.BlockResponse.Hash(childComplexity), true
+		return e.complexity.Block.Hash(childComplexity), true
 
-	case "BlockResponse.height":
-		if e.complexity.BlockResponse.Height == nil {
+	case "Block.height":
+		if e.complexity.Block.Height == nil {
 			break
 		}
 
-		return e.complexity.BlockResponse.Height(childComplexity), true
+		return e.complexity.Block.Height(childComplexity), true
 
-	case "BlockResponse.medianTime":
-		if e.complexity.BlockResponse.MedianTime == nil {
+	case "Block.medianTime":
+		if e.complexity.Block.MedianTime == nil {
 			break
 		}
 
-		return e.complexity.BlockResponse.MedianTime(childComplexity), true
+		return e.complexity.Block.MedianTime(childComplexity), true
 
-	case "BlockResponse.merkeRoot":
-		if e.complexity.BlockResponse.MerkeRoot == nil {
+	case "Block.merkeRoot":
+		if e.complexity.Block.MerkeRoot == nil {
 			break
 		}
 
-		return e.complexity.BlockResponse.MerkeRoot(childComplexity), true
+		return e.complexity.Block.MerkeRoot(childComplexity), true
 
-	case "BlockResponse.nTx":
-		if e.complexity.BlockResponse.NTx == nil {
+	case "Block.nTx":
+		if e.complexity.Block.NTx == nil {
 			break
 		}
 
-		return e.complexity.BlockResponse.NTx(childComplexity), true
+		return e.complexity.Block.NTx(childComplexity), true
 
-	case "BlockResponse.nextBlockHash":
-		if e.complexity.BlockResponse.NextBlockHash == nil {
+	case "Block.nextBlockHash":
+		if e.complexity.Block.NextBlockHash == nil {
 			break
 		}
 
-		return e.complexity.BlockResponse.NextBlockHash(childComplexity), true
+		return e.complexity.Block.NextBlockHash(childComplexity), true
 
-	case "BlockResponse.nonce":
-		if e.complexity.BlockResponse.Nonce == nil {
+	case "Block.nonce":
+		if e.complexity.Block.Nonce == nil {
 			break
 		}
 
-		return e.complexity.BlockResponse.Nonce(childComplexity), true
+		return e.complexity.Block.Nonce(childComplexity), true
 
-	case "BlockResponse.previousBlockHash":
-		if e.complexity.BlockResponse.PreviousBlockHash == nil {
+	case "Block.previousBlockHash":
+		if e.complexity.Block.PreviousBlockHash == nil {
 			break
 		}
 
-		return e.complexity.BlockResponse.PreviousBlockHash(childComplexity), true
+		return e.complexity.Block.PreviousBlockHash(childComplexity), true
 
-	case "BlockResponse.size":
-		if e.complexity.BlockResponse.Size == nil {
+	case "Block.size":
+		if e.complexity.Block.Size == nil {
 			break
 		}
 
-		return e.complexity.BlockResponse.Size(childComplexity), true
+		return e.complexity.Block.Size(childComplexity), true
 
-	case "BlockResponse.strippedSize":
-		if e.complexity.BlockResponse.StrippedSize == nil {
+	case "Block.strippedSize":
+		if e.complexity.Block.StrippedSize == nil {
 			break
 		}
 
-		return e.complexity.BlockResponse.StrippedSize(childComplexity), true
+		return e.complexity.Block.StrippedSize(childComplexity), true
 
-	case "BlockResponse.time":
-		if e.complexity.BlockResponse.Time == nil {
+	case "Block.time":
+		if e.complexity.Block.Time == nil {
 			break
 		}
 
-		return e.complexity.BlockResponse.Time(childComplexity), true
+		return e.complexity.Block.Time(childComplexity), true
 
-	case "BlockResponse.version":
-		if e.complexity.BlockResponse.Version == nil {
+	case "Block.version":
+		if e.complexity.Block.Version == nil {
 			break
 		}
 
-		return e.complexity.BlockResponse.Version(childComplexity), true
+		return e.complexity.Block.Version(childComplexity), true
 
-	case "BlockResponse.versionHex":
-		if e.complexity.BlockResponse.VersionHex == nil {
+	case "Block.versionHex":
+		if e.complexity.Block.VersionHex == nil {
 			break
 		}
 
-		return e.complexity.BlockResponse.VersionHex(childComplexity), true
+		return e.complexity.Block.VersionHex(childComplexity), true
 
-	case "BlockResponse.weight":
-		if e.complexity.BlockResponse.Weight == nil {
+	case "Block.weight":
+		if e.complexity.Block.Weight == nil {
 			break
 		}
 
-		return e.complexity.BlockResponse.Weight(childComplexity), true
+		return e.complexity.Block.Weight(childComplexity), true
+
+	case "LatestBlocksResponse.blocks":
+		if e.complexity.LatestBlocksResponse.Blocks == nil {
+			break
+		}
+
+		return e.complexity.LatestBlocksResponse.Blocks(childComplexity), true
+
+	case "LatestBlocksResponse.height":
+		if e.complexity.LatestBlocksResponse.Height == nil {
+			break
+		}
+
+		return e.complexity.LatestBlocksResponse.Height(childComplexity), true
 
 	case "Query.getBalanceByAddress":
 		if e.complexity.Query.GetBalanceByAddress == nil {
@@ -283,6 +304,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.GetBlockByHeight(childComplexity, args["height"].(int32)), true
 
+	case "Query.getLatestBlocks":
+		if e.complexity.Query.GetLatestBlocks == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getLatestBlocks_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetLatestBlocks(childComplexity, args["count"].(int32)), true
+
 	case "Query.getTransactionByTxId":
 		if e.complexity.Query.GetTransactionByTxID == nil {
 			break
@@ -295,89 +328,89 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.GetTransactionByTxID(childComplexity, args["txId"].(string)), true
 
-	case "TransactionResponse.blockHash":
-		if e.complexity.TransactionResponse.BlockHash == nil {
+	case "Transaction.blockHash":
+		if e.complexity.Transaction.BlockHash == nil {
 			break
 		}
 
-		return e.complexity.TransactionResponse.BlockHash(childComplexity), true
+		return e.complexity.Transaction.BlockHash(childComplexity), true
 
-	case "TransactionResponse.blockTime":
-		if e.complexity.TransactionResponse.BlockTime == nil {
+	case "Transaction.blockTime":
+		if e.complexity.Transaction.BlockTime == nil {
 			break
 		}
 
-		return e.complexity.TransactionResponse.BlockTime(childComplexity), true
+		return e.complexity.Transaction.BlockTime(childComplexity), true
 
-	case "TransactionResponse.confirmations":
-		if e.complexity.TransactionResponse.Confirmations == nil {
+	case "Transaction.confirmations":
+		if e.complexity.Transaction.Confirmations == nil {
 			break
 		}
 
-		return e.complexity.TransactionResponse.Confirmations(childComplexity), true
+		return e.complexity.Transaction.Confirmations(childComplexity), true
 
-	case "TransactionResponse.hash":
-		if e.complexity.TransactionResponse.Hash == nil {
+	case "Transaction.hash":
+		if e.complexity.Transaction.Hash == nil {
 			break
 		}
 
-		return e.complexity.TransactionResponse.Hash(childComplexity), true
+		return e.complexity.Transaction.Hash(childComplexity), true
 
-	case "TransactionResponse.hex":
-		if e.complexity.TransactionResponse.Hex == nil {
+	case "Transaction.hex":
+		if e.complexity.Transaction.Hex == nil {
 			break
 		}
 
-		return e.complexity.TransactionResponse.Hex(childComplexity), true
+		return e.complexity.Transaction.Hex(childComplexity), true
 
-	case "TransactionResponse.locktime":
-		if e.complexity.TransactionResponse.Locktime == nil {
+	case "Transaction.locktime":
+		if e.complexity.Transaction.Locktime == nil {
 			break
 		}
 
-		return e.complexity.TransactionResponse.Locktime(childComplexity), true
+		return e.complexity.Transaction.Locktime(childComplexity), true
 
-	case "TransactionResponse.size":
-		if e.complexity.TransactionResponse.Size == nil {
+	case "Transaction.size":
+		if e.complexity.Transaction.Size == nil {
 			break
 		}
 
-		return e.complexity.TransactionResponse.Size(childComplexity), true
+		return e.complexity.Transaction.Size(childComplexity), true
 
-	case "TransactionResponse.time":
-		if e.complexity.TransactionResponse.Time == nil {
+	case "Transaction.time":
+		if e.complexity.Transaction.Time == nil {
 			break
 		}
 
-		return e.complexity.TransactionResponse.Time(childComplexity), true
+		return e.complexity.Transaction.Time(childComplexity), true
 
-	case "TransactionResponse.txId":
-		if e.complexity.TransactionResponse.TxID == nil {
+	case "Transaction.txId":
+		if e.complexity.Transaction.TxID == nil {
 			break
 		}
 
-		return e.complexity.TransactionResponse.TxID(childComplexity), true
+		return e.complexity.Transaction.TxID(childComplexity), true
 
-	case "TransactionResponse.version":
-		if e.complexity.TransactionResponse.Version == nil {
+	case "Transaction.version":
+		if e.complexity.Transaction.Version == nil {
 			break
 		}
 
-		return e.complexity.TransactionResponse.Version(childComplexity), true
+		return e.complexity.Transaction.Version(childComplexity), true
 
-	case "TransactionResponse.vsize":
-		if e.complexity.TransactionResponse.Vsize == nil {
+	case "Transaction.vsize":
+		if e.complexity.Transaction.Vsize == nil {
 			break
 		}
 
-		return e.complexity.TransactionResponse.Vsize(childComplexity), true
+		return e.complexity.Transaction.Vsize(childComplexity), true
 
-	case "TransactionResponse.weight":
-		if e.complexity.TransactionResponse.Weight == nil {
+	case "Transaction.weight":
+		if e.complexity.Transaction.Weight == nil {
 			break
 		}
 
-		return e.complexity.TransactionResponse.Weight(childComplexity), true
+		return e.complexity.Transaction.Weight(childComplexity), true
 
 	}
 	return 0, false
@@ -556,6 +589,29 @@ func (ec *executionContext) field_Query_getBlockByHeight_argsHeight(
 	return zeroVal, nil
 }
 
+func (ec *executionContext) field_Query_getLatestBlocks_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Query_getLatestBlocks_argsCount(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["count"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Query_getLatestBlocks_argsCount(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (int32, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("count"))
+	if tmp, ok := rawArgs["count"]; ok {
+		return ec.unmarshalNInt2int32(ctx, tmp)
+	}
+
+	var zeroVal int32
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_Query_getTransactionByTxId_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -721,8 +777,8 @@ func (ec *executionContext) fieldContext_BalanceResponse_balance(_ context.Conte
 	return fc, nil
 }
 
-func (ec *executionContext) _BlockResponse_hash(ctx context.Context, field graphql.CollectedField, obj *model.BlockResponse) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_BlockResponse_hash(ctx, field)
+func (ec *executionContext) _Block_hash(ctx context.Context, field graphql.CollectedField, obj *model.Block) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Block_hash(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -752,9 +808,9 @@ func (ec *executionContext) _BlockResponse_hash(ctx context.Context, field graph
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_BlockResponse_hash(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Block_hash(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "BlockResponse",
+		Object:     "Block",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -765,8 +821,8 @@ func (ec *executionContext) fieldContext_BlockResponse_hash(_ context.Context, f
 	return fc, nil
 }
 
-func (ec *executionContext) _BlockResponse_confirmations(ctx context.Context, field graphql.CollectedField, obj *model.BlockResponse) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_BlockResponse_confirmations(ctx, field)
+func (ec *executionContext) _Block_confirmations(ctx context.Context, field graphql.CollectedField, obj *model.Block) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Block_confirmations(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -796,9 +852,9 @@ func (ec *executionContext) _BlockResponse_confirmations(ctx context.Context, fi
 	return ec.marshalNInt2int32(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_BlockResponse_confirmations(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Block_confirmations(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "BlockResponse",
+		Object:     "Block",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -809,8 +865,8 @@ func (ec *executionContext) fieldContext_BlockResponse_confirmations(_ context.C
 	return fc, nil
 }
 
-func (ec *executionContext) _BlockResponse_size(ctx context.Context, field graphql.CollectedField, obj *model.BlockResponse) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_BlockResponse_size(ctx, field)
+func (ec *executionContext) _Block_size(ctx context.Context, field graphql.CollectedField, obj *model.Block) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Block_size(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -840,9 +896,9 @@ func (ec *executionContext) _BlockResponse_size(ctx context.Context, field graph
 	return ec.marshalNInt2int32(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_BlockResponse_size(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Block_size(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "BlockResponse",
+		Object:     "Block",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -853,8 +909,8 @@ func (ec *executionContext) fieldContext_BlockResponse_size(_ context.Context, f
 	return fc, nil
 }
 
-func (ec *executionContext) _BlockResponse_strippedSize(ctx context.Context, field graphql.CollectedField, obj *model.BlockResponse) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_BlockResponse_strippedSize(ctx, field)
+func (ec *executionContext) _Block_strippedSize(ctx context.Context, field graphql.CollectedField, obj *model.Block) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Block_strippedSize(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -884,9 +940,9 @@ func (ec *executionContext) _BlockResponse_strippedSize(ctx context.Context, fie
 	return ec.marshalNInt2int32(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_BlockResponse_strippedSize(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Block_strippedSize(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "BlockResponse",
+		Object:     "Block",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -897,8 +953,8 @@ func (ec *executionContext) fieldContext_BlockResponse_strippedSize(_ context.Co
 	return fc, nil
 }
 
-func (ec *executionContext) _BlockResponse_weight(ctx context.Context, field graphql.CollectedField, obj *model.BlockResponse) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_BlockResponse_weight(ctx, field)
+func (ec *executionContext) _Block_weight(ctx context.Context, field graphql.CollectedField, obj *model.Block) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Block_weight(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -928,9 +984,9 @@ func (ec *executionContext) _BlockResponse_weight(ctx context.Context, field gra
 	return ec.marshalNInt2int32(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_BlockResponse_weight(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Block_weight(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "BlockResponse",
+		Object:     "Block",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -941,8 +997,8 @@ func (ec *executionContext) fieldContext_BlockResponse_weight(_ context.Context,
 	return fc, nil
 }
 
-func (ec *executionContext) _BlockResponse_height(ctx context.Context, field graphql.CollectedField, obj *model.BlockResponse) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_BlockResponse_height(ctx, field)
+func (ec *executionContext) _Block_height(ctx context.Context, field graphql.CollectedField, obj *model.Block) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Block_height(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -972,9 +1028,9 @@ func (ec *executionContext) _BlockResponse_height(ctx context.Context, field gra
 	return ec.marshalNInt2int32(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_BlockResponse_height(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Block_height(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "BlockResponse",
+		Object:     "Block",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -985,8 +1041,8 @@ func (ec *executionContext) fieldContext_BlockResponse_height(_ context.Context,
 	return fc, nil
 }
 
-func (ec *executionContext) _BlockResponse_version(ctx context.Context, field graphql.CollectedField, obj *model.BlockResponse) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_BlockResponse_version(ctx, field)
+func (ec *executionContext) _Block_version(ctx context.Context, field graphql.CollectedField, obj *model.Block) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Block_version(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1016,9 +1072,9 @@ func (ec *executionContext) _BlockResponse_version(ctx context.Context, field gr
 	return ec.marshalNInt2int32(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_BlockResponse_version(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Block_version(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "BlockResponse",
+		Object:     "Block",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -1029,8 +1085,8 @@ func (ec *executionContext) fieldContext_BlockResponse_version(_ context.Context
 	return fc, nil
 }
 
-func (ec *executionContext) _BlockResponse_versionHex(ctx context.Context, field graphql.CollectedField, obj *model.BlockResponse) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_BlockResponse_versionHex(ctx, field)
+func (ec *executionContext) _Block_versionHex(ctx context.Context, field graphql.CollectedField, obj *model.Block) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Block_versionHex(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1060,9 +1116,9 @@ func (ec *executionContext) _BlockResponse_versionHex(ctx context.Context, field
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_BlockResponse_versionHex(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Block_versionHex(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "BlockResponse",
+		Object:     "Block",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -1073,8 +1129,8 @@ func (ec *executionContext) fieldContext_BlockResponse_versionHex(_ context.Cont
 	return fc, nil
 }
 
-func (ec *executionContext) _BlockResponse_merkeRoot(ctx context.Context, field graphql.CollectedField, obj *model.BlockResponse) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_BlockResponse_merkeRoot(ctx, field)
+func (ec *executionContext) _Block_merkeRoot(ctx context.Context, field graphql.CollectedField, obj *model.Block) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Block_merkeRoot(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1104,9 +1160,9 @@ func (ec *executionContext) _BlockResponse_merkeRoot(ctx context.Context, field 
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_BlockResponse_merkeRoot(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Block_merkeRoot(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "BlockResponse",
+		Object:     "Block",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -1117,8 +1173,8 @@ func (ec *executionContext) fieldContext_BlockResponse_merkeRoot(_ context.Conte
 	return fc, nil
 }
 
-func (ec *executionContext) _BlockResponse_time(ctx context.Context, field graphql.CollectedField, obj *model.BlockResponse) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_BlockResponse_time(ctx, field)
+func (ec *executionContext) _Block_time(ctx context.Context, field graphql.CollectedField, obj *model.Block) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Block_time(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1148,9 +1204,9 @@ func (ec *executionContext) _BlockResponse_time(ctx context.Context, field graph
 	return ec.marshalNInt2int32(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_BlockResponse_time(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Block_time(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "BlockResponse",
+		Object:     "Block",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -1161,8 +1217,8 @@ func (ec *executionContext) fieldContext_BlockResponse_time(_ context.Context, f
 	return fc, nil
 }
 
-func (ec *executionContext) _BlockResponse_medianTime(ctx context.Context, field graphql.CollectedField, obj *model.BlockResponse) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_BlockResponse_medianTime(ctx, field)
+func (ec *executionContext) _Block_medianTime(ctx context.Context, field graphql.CollectedField, obj *model.Block) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Block_medianTime(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1192,9 +1248,9 @@ func (ec *executionContext) _BlockResponse_medianTime(ctx context.Context, field
 	return ec.marshalNInt2int32(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_BlockResponse_medianTime(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Block_medianTime(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "BlockResponse",
+		Object:     "Block",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -1205,8 +1261,8 @@ func (ec *executionContext) fieldContext_BlockResponse_medianTime(_ context.Cont
 	return fc, nil
 }
 
-func (ec *executionContext) _BlockResponse_nonce(ctx context.Context, field graphql.CollectedField, obj *model.BlockResponse) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_BlockResponse_nonce(ctx, field)
+func (ec *executionContext) _Block_nonce(ctx context.Context, field graphql.CollectedField, obj *model.Block) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Block_nonce(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1236,9 +1292,9 @@ func (ec *executionContext) _BlockResponse_nonce(ctx context.Context, field grap
 	return ec.marshalNInt2int32(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_BlockResponse_nonce(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Block_nonce(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "BlockResponse",
+		Object:     "Block",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -1249,8 +1305,8 @@ func (ec *executionContext) fieldContext_BlockResponse_nonce(_ context.Context, 
 	return fc, nil
 }
 
-func (ec *executionContext) _BlockResponse_bits(ctx context.Context, field graphql.CollectedField, obj *model.BlockResponse) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_BlockResponse_bits(ctx, field)
+func (ec *executionContext) _Block_bits(ctx context.Context, field graphql.CollectedField, obj *model.Block) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Block_bits(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1280,9 +1336,9 @@ func (ec *executionContext) _BlockResponse_bits(ctx context.Context, field graph
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_BlockResponse_bits(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Block_bits(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "BlockResponse",
+		Object:     "Block",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -1293,8 +1349,8 @@ func (ec *executionContext) fieldContext_BlockResponse_bits(_ context.Context, f
 	return fc, nil
 }
 
-func (ec *executionContext) _BlockResponse_difficulty(ctx context.Context, field graphql.CollectedField, obj *model.BlockResponse) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_BlockResponse_difficulty(ctx, field)
+func (ec *executionContext) _Block_difficulty(ctx context.Context, field graphql.CollectedField, obj *model.Block) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Block_difficulty(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1324,9 +1380,9 @@ func (ec *executionContext) _BlockResponse_difficulty(ctx context.Context, field
 	return ec.marshalNFloat2float64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_BlockResponse_difficulty(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Block_difficulty(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "BlockResponse",
+		Object:     "Block",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -1337,8 +1393,8 @@ func (ec *executionContext) fieldContext_BlockResponse_difficulty(_ context.Cont
 	return fc, nil
 }
 
-func (ec *executionContext) _BlockResponse_chainwork(ctx context.Context, field graphql.CollectedField, obj *model.BlockResponse) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_BlockResponse_chainwork(ctx, field)
+func (ec *executionContext) _Block_chainwork(ctx context.Context, field graphql.CollectedField, obj *model.Block) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Block_chainwork(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1368,9 +1424,9 @@ func (ec *executionContext) _BlockResponse_chainwork(ctx context.Context, field 
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_BlockResponse_chainwork(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Block_chainwork(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "BlockResponse",
+		Object:     "Block",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -1381,8 +1437,8 @@ func (ec *executionContext) fieldContext_BlockResponse_chainwork(_ context.Conte
 	return fc, nil
 }
 
-func (ec *executionContext) _BlockResponse_nTx(ctx context.Context, field graphql.CollectedField, obj *model.BlockResponse) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_BlockResponse_nTx(ctx, field)
+func (ec *executionContext) _Block_nTx(ctx context.Context, field graphql.CollectedField, obj *model.Block) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Block_nTx(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1412,9 +1468,9 @@ func (ec *executionContext) _BlockResponse_nTx(ctx context.Context, field graphq
 	return ec.marshalNInt2int32(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_BlockResponse_nTx(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Block_nTx(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "BlockResponse",
+		Object:     "Block",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -1425,8 +1481,8 @@ func (ec *executionContext) fieldContext_BlockResponse_nTx(_ context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _BlockResponse_previousBlockHash(ctx context.Context, field graphql.CollectedField, obj *model.BlockResponse) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_BlockResponse_previousBlockHash(ctx, field)
+func (ec *executionContext) _Block_previousBlockHash(ctx context.Context, field graphql.CollectedField, obj *model.Block) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Block_previousBlockHash(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1456,9 +1512,9 @@ func (ec *executionContext) _BlockResponse_previousBlockHash(ctx context.Context
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_BlockResponse_previousBlockHash(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Block_previousBlockHash(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "BlockResponse",
+		Object:     "Block",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -1469,8 +1525,8 @@ func (ec *executionContext) fieldContext_BlockResponse_previousBlockHash(_ conte
 	return fc, nil
 }
 
-func (ec *executionContext) _BlockResponse_nextBlockHash(ctx context.Context, field graphql.CollectedField, obj *model.BlockResponse) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_BlockResponse_nextBlockHash(ctx, field)
+func (ec *executionContext) _Block_nextBlockHash(ctx context.Context, field graphql.CollectedField, obj *model.Block) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Block_nextBlockHash(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1500,15 +1556,199 @@ func (ec *executionContext) _BlockResponse_nextBlockHash(ctx context.Context, fi
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_BlockResponse_nextBlockHash(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Block_nextBlockHash(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "BlockResponse",
+		Object:     "Block",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LatestBlocksResponse_height(ctx context.Context, field graphql.CollectedField, obj *model.LatestBlocksResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LatestBlocksResponse_height(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Height, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int32)
+	fc.Result = res
+	return ec.marshalNInt2int32(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LatestBlocksResponse_height(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LatestBlocksResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LatestBlocksResponse_blocks(ctx context.Context, field graphql.CollectedField, obj *model.LatestBlocksResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LatestBlocksResponse_blocks(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Blocks, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Block)
+	fc.Result = res
+	return ec.marshalNBlock2ᚕᚖserverᚋgraphᚋmodelᚐBlockᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LatestBlocksResponse_blocks(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LatestBlocksResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "hash":
+				return ec.fieldContext_Block_hash(ctx, field)
+			case "confirmations":
+				return ec.fieldContext_Block_confirmations(ctx, field)
+			case "size":
+				return ec.fieldContext_Block_size(ctx, field)
+			case "strippedSize":
+				return ec.fieldContext_Block_strippedSize(ctx, field)
+			case "weight":
+				return ec.fieldContext_Block_weight(ctx, field)
+			case "height":
+				return ec.fieldContext_Block_height(ctx, field)
+			case "version":
+				return ec.fieldContext_Block_version(ctx, field)
+			case "versionHex":
+				return ec.fieldContext_Block_versionHex(ctx, field)
+			case "merkeRoot":
+				return ec.fieldContext_Block_merkeRoot(ctx, field)
+			case "time":
+				return ec.fieldContext_Block_time(ctx, field)
+			case "medianTime":
+				return ec.fieldContext_Block_medianTime(ctx, field)
+			case "nonce":
+				return ec.fieldContext_Block_nonce(ctx, field)
+			case "bits":
+				return ec.fieldContext_Block_bits(ctx, field)
+			case "difficulty":
+				return ec.fieldContext_Block_difficulty(ctx, field)
+			case "chainwork":
+				return ec.fieldContext_Block_chainwork(ctx, field)
+			case "nTx":
+				return ec.fieldContext_Block_nTx(ctx, field)
+			case "previousBlockHash":
+				return ec.fieldContext_Block_previousBlockHash(ctx, field)
+			case "nextBlockHash":
+				return ec.fieldContext_Block_nextBlockHash(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Block", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_getLatestBlocks(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_getLatestBlocks(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetLatestBlocks(rctx, fc.Args["count"].(int32))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.LatestBlocksResponse)
+	fc.Result = res
+	return ec.marshalOLatestBlocksResponse2ᚖserverᚋgraphᚋmodelᚐLatestBlocksResponse(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_getLatestBlocks(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "height":
+				return ec.fieldContext_LatestBlocksResponse_height(ctx, field)
+			case "blocks":
+				return ec.fieldContext_LatestBlocksResponse_blocks(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type LatestBlocksResponse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_getLatestBlocks_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -1594,9 +1834,9 @@ func (ec *executionContext) _Query_getTransactionByTxId(ctx context.Context, fie
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.TransactionResponse)
+	res := resTmp.(*model.Transaction)
 	fc.Result = res
-	return ec.marshalOTransactionResponse2ᚖserverᚋgraphᚋmodelᚐTransactionResponse(ctx, field.Selections, res)
+	return ec.marshalOTransaction2ᚖserverᚋgraphᚋmodelᚐTransaction(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_getTransactionByTxId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1608,31 +1848,31 @@ func (ec *executionContext) fieldContext_Query_getTransactionByTxId(ctx context.
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "hex":
-				return ec.fieldContext_TransactionResponse_hex(ctx, field)
+				return ec.fieldContext_Transaction_hex(ctx, field)
 			case "txId":
-				return ec.fieldContext_TransactionResponse_txId(ctx, field)
+				return ec.fieldContext_Transaction_txId(ctx, field)
 			case "hash":
-				return ec.fieldContext_TransactionResponse_hash(ctx, field)
+				return ec.fieldContext_Transaction_hash(ctx, field)
 			case "size":
-				return ec.fieldContext_TransactionResponse_size(ctx, field)
+				return ec.fieldContext_Transaction_size(ctx, field)
 			case "vsize":
-				return ec.fieldContext_TransactionResponse_vsize(ctx, field)
+				return ec.fieldContext_Transaction_vsize(ctx, field)
 			case "weight":
-				return ec.fieldContext_TransactionResponse_weight(ctx, field)
+				return ec.fieldContext_Transaction_weight(ctx, field)
 			case "version":
-				return ec.fieldContext_TransactionResponse_version(ctx, field)
+				return ec.fieldContext_Transaction_version(ctx, field)
 			case "locktime":
-				return ec.fieldContext_TransactionResponse_locktime(ctx, field)
+				return ec.fieldContext_Transaction_locktime(ctx, field)
 			case "blockHash":
-				return ec.fieldContext_TransactionResponse_blockHash(ctx, field)
+				return ec.fieldContext_Transaction_blockHash(ctx, field)
 			case "confirmations":
-				return ec.fieldContext_TransactionResponse_confirmations(ctx, field)
+				return ec.fieldContext_Transaction_confirmations(ctx, field)
 			case "blockTime":
-				return ec.fieldContext_TransactionResponse_blockTime(ctx, field)
+				return ec.fieldContext_Transaction_blockTime(ctx, field)
 			case "time":
-				return ec.fieldContext_TransactionResponse_time(ctx, field)
+				return ec.fieldContext_Transaction_time(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type TransactionResponse", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Transaction", field.Name)
 		},
 	}
 	defer func() {
@@ -1672,9 +1912,9 @@ func (ec *executionContext) _Query_getBlockByHeight(ctx context.Context, field g
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.BlockResponse)
+	res := resTmp.(*model.Block)
 	fc.Result = res
-	return ec.marshalOBlockResponse2ᚖserverᚋgraphᚋmodelᚐBlockResponse(ctx, field.Selections, res)
+	return ec.marshalOBlock2ᚖserverᚋgraphᚋmodelᚐBlock(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_getBlockByHeight(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1686,43 +1926,43 @@ func (ec *executionContext) fieldContext_Query_getBlockByHeight(ctx context.Cont
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "hash":
-				return ec.fieldContext_BlockResponse_hash(ctx, field)
+				return ec.fieldContext_Block_hash(ctx, field)
 			case "confirmations":
-				return ec.fieldContext_BlockResponse_confirmations(ctx, field)
+				return ec.fieldContext_Block_confirmations(ctx, field)
 			case "size":
-				return ec.fieldContext_BlockResponse_size(ctx, field)
+				return ec.fieldContext_Block_size(ctx, field)
 			case "strippedSize":
-				return ec.fieldContext_BlockResponse_strippedSize(ctx, field)
+				return ec.fieldContext_Block_strippedSize(ctx, field)
 			case "weight":
-				return ec.fieldContext_BlockResponse_weight(ctx, field)
+				return ec.fieldContext_Block_weight(ctx, field)
 			case "height":
-				return ec.fieldContext_BlockResponse_height(ctx, field)
+				return ec.fieldContext_Block_height(ctx, field)
 			case "version":
-				return ec.fieldContext_BlockResponse_version(ctx, field)
+				return ec.fieldContext_Block_version(ctx, field)
 			case "versionHex":
-				return ec.fieldContext_BlockResponse_versionHex(ctx, field)
+				return ec.fieldContext_Block_versionHex(ctx, field)
 			case "merkeRoot":
-				return ec.fieldContext_BlockResponse_merkeRoot(ctx, field)
+				return ec.fieldContext_Block_merkeRoot(ctx, field)
 			case "time":
-				return ec.fieldContext_BlockResponse_time(ctx, field)
+				return ec.fieldContext_Block_time(ctx, field)
 			case "medianTime":
-				return ec.fieldContext_BlockResponse_medianTime(ctx, field)
+				return ec.fieldContext_Block_medianTime(ctx, field)
 			case "nonce":
-				return ec.fieldContext_BlockResponse_nonce(ctx, field)
+				return ec.fieldContext_Block_nonce(ctx, field)
 			case "bits":
-				return ec.fieldContext_BlockResponse_bits(ctx, field)
+				return ec.fieldContext_Block_bits(ctx, field)
 			case "difficulty":
-				return ec.fieldContext_BlockResponse_difficulty(ctx, field)
+				return ec.fieldContext_Block_difficulty(ctx, field)
 			case "chainwork":
-				return ec.fieldContext_BlockResponse_chainwork(ctx, field)
+				return ec.fieldContext_Block_chainwork(ctx, field)
 			case "nTx":
-				return ec.fieldContext_BlockResponse_nTx(ctx, field)
+				return ec.fieldContext_Block_nTx(ctx, field)
 			case "previousBlockHash":
-				return ec.fieldContext_BlockResponse_previousBlockHash(ctx, field)
+				return ec.fieldContext_Block_previousBlockHash(ctx, field)
 			case "nextBlockHash":
-				return ec.fieldContext_BlockResponse_nextBlockHash(ctx, field)
+				return ec.fieldContext_Block_nextBlockHash(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type BlockResponse", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Block", field.Name)
 		},
 	}
 	defer func() {
@@ -1868,8 +2108,8 @@ func (ec *executionContext) fieldContext_Query___schema(_ context.Context, field
 	return fc, nil
 }
 
-func (ec *executionContext) _TransactionResponse_hex(ctx context.Context, field graphql.CollectedField, obj *model.TransactionResponse) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_TransactionResponse_hex(ctx, field)
+func (ec *executionContext) _Transaction_hex(ctx context.Context, field graphql.CollectedField, obj *model.Transaction) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Transaction_hex(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1899,9 +2139,9 @@ func (ec *executionContext) _TransactionResponse_hex(ctx context.Context, field 
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_TransactionResponse_hex(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Transaction_hex(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "TransactionResponse",
+		Object:     "Transaction",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -1912,8 +2152,8 @@ func (ec *executionContext) fieldContext_TransactionResponse_hex(_ context.Conte
 	return fc, nil
 }
 
-func (ec *executionContext) _TransactionResponse_txId(ctx context.Context, field graphql.CollectedField, obj *model.TransactionResponse) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_TransactionResponse_txId(ctx, field)
+func (ec *executionContext) _Transaction_txId(ctx context.Context, field graphql.CollectedField, obj *model.Transaction) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Transaction_txId(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1943,9 +2183,9 @@ func (ec *executionContext) _TransactionResponse_txId(ctx context.Context, field
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_TransactionResponse_txId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Transaction_txId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "TransactionResponse",
+		Object:     "Transaction",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -1956,8 +2196,8 @@ func (ec *executionContext) fieldContext_TransactionResponse_txId(_ context.Cont
 	return fc, nil
 }
 
-func (ec *executionContext) _TransactionResponse_hash(ctx context.Context, field graphql.CollectedField, obj *model.TransactionResponse) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_TransactionResponse_hash(ctx, field)
+func (ec *executionContext) _Transaction_hash(ctx context.Context, field graphql.CollectedField, obj *model.Transaction) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Transaction_hash(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1987,9 +2227,9 @@ func (ec *executionContext) _TransactionResponse_hash(ctx context.Context, field
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_TransactionResponse_hash(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Transaction_hash(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "TransactionResponse",
+		Object:     "Transaction",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -2000,8 +2240,8 @@ func (ec *executionContext) fieldContext_TransactionResponse_hash(_ context.Cont
 	return fc, nil
 }
 
-func (ec *executionContext) _TransactionResponse_size(ctx context.Context, field graphql.CollectedField, obj *model.TransactionResponse) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_TransactionResponse_size(ctx, field)
+func (ec *executionContext) _Transaction_size(ctx context.Context, field graphql.CollectedField, obj *model.Transaction) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Transaction_size(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2031,9 +2271,9 @@ func (ec *executionContext) _TransactionResponse_size(ctx context.Context, field
 	return ec.marshalNInt2int32(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_TransactionResponse_size(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Transaction_size(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "TransactionResponse",
+		Object:     "Transaction",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -2044,8 +2284,8 @@ func (ec *executionContext) fieldContext_TransactionResponse_size(_ context.Cont
 	return fc, nil
 }
 
-func (ec *executionContext) _TransactionResponse_vsize(ctx context.Context, field graphql.CollectedField, obj *model.TransactionResponse) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_TransactionResponse_vsize(ctx, field)
+func (ec *executionContext) _Transaction_vsize(ctx context.Context, field graphql.CollectedField, obj *model.Transaction) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Transaction_vsize(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2075,9 +2315,9 @@ func (ec *executionContext) _TransactionResponse_vsize(ctx context.Context, fiel
 	return ec.marshalNInt2int32(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_TransactionResponse_vsize(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Transaction_vsize(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "TransactionResponse",
+		Object:     "Transaction",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -2088,8 +2328,8 @@ func (ec *executionContext) fieldContext_TransactionResponse_vsize(_ context.Con
 	return fc, nil
 }
 
-func (ec *executionContext) _TransactionResponse_weight(ctx context.Context, field graphql.CollectedField, obj *model.TransactionResponse) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_TransactionResponse_weight(ctx, field)
+func (ec *executionContext) _Transaction_weight(ctx context.Context, field graphql.CollectedField, obj *model.Transaction) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Transaction_weight(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2119,9 +2359,9 @@ func (ec *executionContext) _TransactionResponse_weight(ctx context.Context, fie
 	return ec.marshalNInt2int32(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_TransactionResponse_weight(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Transaction_weight(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "TransactionResponse",
+		Object:     "Transaction",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -2132,8 +2372,8 @@ func (ec *executionContext) fieldContext_TransactionResponse_weight(_ context.Co
 	return fc, nil
 }
 
-func (ec *executionContext) _TransactionResponse_version(ctx context.Context, field graphql.CollectedField, obj *model.TransactionResponse) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_TransactionResponse_version(ctx, field)
+func (ec *executionContext) _Transaction_version(ctx context.Context, field graphql.CollectedField, obj *model.Transaction) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Transaction_version(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2163,9 +2403,9 @@ func (ec *executionContext) _TransactionResponse_version(ctx context.Context, fi
 	return ec.marshalNInt2int32(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_TransactionResponse_version(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Transaction_version(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "TransactionResponse",
+		Object:     "Transaction",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -2176,8 +2416,8 @@ func (ec *executionContext) fieldContext_TransactionResponse_version(_ context.C
 	return fc, nil
 }
 
-func (ec *executionContext) _TransactionResponse_locktime(ctx context.Context, field graphql.CollectedField, obj *model.TransactionResponse) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_TransactionResponse_locktime(ctx, field)
+func (ec *executionContext) _Transaction_locktime(ctx context.Context, field graphql.CollectedField, obj *model.Transaction) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Transaction_locktime(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2207,9 +2447,9 @@ func (ec *executionContext) _TransactionResponse_locktime(ctx context.Context, f
 	return ec.marshalNInt2int32(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_TransactionResponse_locktime(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Transaction_locktime(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "TransactionResponse",
+		Object:     "Transaction",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -2220,8 +2460,8 @@ func (ec *executionContext) fieldContext_TransactionResponse_locktime(_ context.
 	return fc, nil
 }
 
-func (ec *executionContext) _TransactionResponse_blockHash(ctx context.Context, field graphql.CollectedField, obj *model.TransactionResponse) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_TransactionResponse_blockHash(ctx, field)
+func (ec *executionContext) _Transaction_blockHash(ctx context.Context, field graphql.CollectedField, obj *model.Transaction) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Transaction_blockHash(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2251,9 +2491,9 @@ func (ec *executionContext) _TransactionResponse_blockHash(ctx context.Context, 
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_TransactionResponse_blockHash(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Transaction_blockHash(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "TransactionResponse",
+		Object:     "Transaction",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -2264,8 +2504,8 @@ func (ec *executionContext) fieldContext_TransactionResponse_blockHash(_ context
 	return fc, nil
 }
 
-func (ec *executionContext) _TransactionResponse_confirmations(ctx context.Context, field graphql.CollectedField, obj *model.TransactionResponse) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_TransactionResponse_confirmations(ctx, field)
+func (ec *executionContext) _Transaction_confirmations(ctx context.Context, field graphql.CollectedField, obj *model.Transaction) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Transaction_confirmations(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2295,9 +2535,9 @@ func (ec *executionContext) _TransactionResponse_confirmations(ctx context.Conte
 	return ec.marshalNInt2int32(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_TransactionResponse_confirmations(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Transaction_confirmations(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "TransactionResponse",
+		Object:     "Transaction",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -2308,8 +2548,8 @@ func (ec *executionContext) fieldContext_TransactionResponse_confirmations(_ con
 	return fc, nil
 }
 
-func (ec *executionContext) _TransactionResponse_blockTime(ctx context.Context, field graphql.CollectedField, obj *model.TransactionResponse) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_TransactionResponse_blockTime(ctx, field)
+func (ec *executionContext) _Transaction_blockTime(ctx context.Context, field graphql.CollectedField, obj *model.Transaction) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Transaction_blockTime(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2339,9 +2579,9 @@ func (ec *executionContext) _TransactionResponse_blockTime(ctx context.Context, 
 	return ec.marshalNInt2int32(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_TransactionResponse_blockTime(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Transaction_blockTime(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "TransactionResponse",
+		Object:     "Transaction",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -2352,8 +2592,8 @@ func (ec *executionContext) fieldContext_TransactionResponse_blockTime(_ context
 	return fc, nil
 }
 
-func (ec *executionContext) _TransactionResponse_time(ctx context.Context, field graphql.CollectedField, obj *model.TransactionResponse) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_TransactionResponse_time(ctx, field)
+func (ec *executionContext) _Transaction_time(ctx context.Context, field graphql.CollectedField, obj *model.Transaction) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Transaction_time(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2383,9 +2623,9 @@ func (ec *executionContext) _TransactionResponse_time(ctx context.Context, field
 	return ec.marshalNInt2int32(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_TransactionResponse_time(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Transaction_time(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "TransactionResponse",
+		Object:     "Transaction",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -4221,104 +4461,148 @@ func (ec *executionContext) _BalanceResponse(ctx context.Context, sel ast.Select
 	return out
 }
 
-var blockResponseImplementors = []string{"BlockResponse"}
+var blockImplementors = []string{"Block"}
 
-func (ec *executionContext) _BlockResponse(ctx context.Context, sel ast.SelectionSet, obj *model.BlockResponse) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, blockResponseImplementors)
+func (ec *executionContext) _Block(ctx context.Context, sel ast.SelectionSet, obj *model.Block) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, blockImplementors)
 
 	out := graphql.NewFieldSet(fields)
 	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("BlockResponse")
+			out.Values[i] = graphql.MarshalString("Block")
 		case "hash":
-			out.Values[i] = ec._BlockResponse_hash(ctx, field, obj)
+			out.Values[i] = ec._Block_hash(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
 		case "confirmations":
-			out.Values[i] = ec._BlockResponse_confirmations(ctx, field, obj)
+			out.Values[i] = ec._Block_confirmations(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
 		case "size":
-			out.Values[i] = ec._BlockResponse_size(ctx, field, obj)
+			out.Values[i] = ec._Block_size(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
 		case "strippedSize":
-			out.Values[i] = ec._BlockResponse_strippedSize(ctx, field, obj)
+			out.Values[i] = ec._Block_strippedSize(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
 		case "weight":
-			out.Values[i] = ec._BlockResponse_weight(ctx, field, obj)
+			out.Values[i] = ec._Block_weight(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
 		case "height":
-			out.Values[i] = ec._BlockResponse_height(ctx, field, obj)
+			out.Values[i] = ec._Block_height(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
 		case "version":
-			out.Values[i] = ec._BlockResponse_version(ctx, field, obj)
+			out.Values[i] = ec._Block_version(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
 		case "versionHex":
-			out.Values[i] = ec._BlockResponse_versionHex(ctx, field, obj)
+			out.Values[i] = ec._Block_versionHex(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
 		case "merkeRoot":
-			out.Values[i] = ec._BlockResponse_merkeRoot(ctx, field, obj)
+			out.Values[i] = ec._Block_merkeRoot(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
 		case "time":
-			out.Values[i] = ec._BlockResponse_time(ctx, field, obj)
+			out.Values[i] = ec._Block_time(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
 		case "medianTime":
-			out.Values[i] = ec._BlockResponse_medianTime(ctx, field, obj)
+			out.Values[i] = ec._Block_medianTime(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
 		case "nonce":
-			out.Values[i] = ec._BlockResponse_nonce(ctx, field, obj)
+			out.Values[i] = ec._Block_nonce(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
 		case "bits":
-			out.Values[i] = ec._BlockResponse_bits(ctx, field, obj)
+			out.Values[i] = ec._Block_bits(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
 		case "difficulty":
-			out.Values[i] = ec._BlockResponse_difficulty(ctx, field, obj)
+			out.Values[i] = ec._Block_difficulty(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
 		case "chainwork":
-			out.Values[i] = ec._BlockResponse_chainwork(ctx, field, obj)
+			out.Values[i] = ec._Block_chainwork(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
 		case "nTx":
-			out.Values[i] = ec._BlockResponse_nTx(ctx, field, obj)
+			out.Values[i] = ec._Block_nTx(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
 		case "previousBlockHash":
-			out.Values[i] = ec._BlockResponse_previousBlockHash(ctx, field, obj)
+			out.Values[i] = ec._Block_previousBlockHash(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
 		case "nextBlockHash":
-			out.Values[i] = ec._BlockResponse_nextBlockHash(ctx, field, obj)
+			out.Values[i] = ec._Block_nextBlockHash(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var latestBlocksResponseImplementors = []string{"LatestBlocksResponse"}
+
+func (ec *executionContext) _LatestBlocksResponse(ctx context.Context, sel ast.SelectionSet, obj *model.LatestBlocksResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, latestBlocksResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("LatestBlocksResponse")
+		case "height":
+			out.Values[i] = ec._LatestBlocksResponse_height(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "blocks":
+			out.Values[i] = ec._LatestBlocksResponse_blocks(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -4364,6 +4648,25 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
+		case "getLatestBlocks":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getLatestBlocks(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "getBalanceByAddress":
 			field := field
 
@@ -4452,74 +4755,74 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 	return out
 }
 
-var transactionResponseImplementors = []string{"TransactionResponse"}
+var transactionImplementors = []string{"Transaction"}
 
-func (ec *executionContext) _TransactionResponse(ctx context.Context, sel ast.SelectionSet, obj *model.TransactionResponse) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, transactionResponseImplementors)
+func (ec *executionContext) _Transaction(ctx context.Context, sel ast.SelectionSet, obj *model.Transaction) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, transactionImplementors)
 
 	out := graphql.NewFieldSet(fields)
 	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("TransactionResponse")
+			out.Values[i] = graphql.MarshalString("Transaction")
 		case "hex":
-			out.Values[i] = ec._TransactionResponse_hex(ctx, field, obj)
+			out.Values[i] = ec._Transaction_hex(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
 		case "txId":
-			out.Values[i] = ec._TransactionResponse_txId(ctx, field, obj)
+			out.Values[i] = ec._Transaction_txId(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
 		case "hash":
-			out.Values[i] = ec._TransactionResponse_hash(ctx, field, obj)
+			out.Values[i] = ec._Transaction_hash(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
 		case "size":
-			out.Values[i] = ec._TransactionResponse_size(ctx, field, obj)
+			out.Values[i] = ec._Transaction_size(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
 		case "vsize":
-			out.Values[i] = ec._TransactionResponse_vsize(ctx, field, obj)
+			out.Values[i] = ec._Transaction_vsize(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
 		case "weight":
-			out.Values[i] = ec._TransactionResponse_weight(ctx, field, obj)
+			out.Values[i] = ec._Transaction_weight(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
 		case "version":
-			out.Values[i] = ec._TransactionResponse_version(ctx, field, obj)
+			out.Values[i] = ec._Transaction_version(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
 		case "locktime":
-			out.Values[i] = ec._TransactionResponse_locktime(ctx, field, obj)
+			out.Values[i] = ec._Transaction_locktime(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
 		case "blockHash":
-			out.Values[i] = ec._TransactionResponse_blockHash(ctx, field, obj)
+			out.Values[i] = ec._Transaction_blockHash(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
 		case "confirmations":
-			out.Values[i] = ec._TransactionResponse_confirmations(ctx, field, obj)
+			out.Values[i] = ec._Transaction_confirmations(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
 		case "blockTime":
-			out.Values[i] = ec._TransactionResponse_blockTime(ctx, field, obj)
+			out.Values[i] = ec._Transaction_blockTime(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
 		case "time":
-			out.Values[i] = ec._TransactionResponse_time(ctx, field, obj)
+			out.Values[i] = ec._Transaction_time(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -4872,6 +5175,60 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 
 // region    ***************************** type.gotpl *****************************
 
+func (ec *executionContext) marshalNBlock2ᚕᚖserverᚋgraphᚋmodelᚐBlockᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Block) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNBlock2ᚖserverᚋgraphᚋmodelᚐBlock(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNBlock2ᚖserverᚋgraphᚋmodelᚐBlock(ctx context.Context, sel ast.SelectionSet, v *model.Block) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Block(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v any) (bool, error) {
 	res, err := graphql.UnmarshalBoolean(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -5192,11 +5549,11 @@ func (ec *executionContext) marshalOBalanceResponse2ᚖserverᚋgraphᚋmodelᚐ
 	return ec._BalanceResponse(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOBlockResponse2ᚖserverᚋgraphᚋmodelᚐBlockResponse(ctx context.Context, sel ast.SelectionSet, v *model.BlockResponse) graphql.Marshaler {
+func (ec *executionContext) marshalOBlock2ᚖserverᚋgraphᚋmodelᚐBlock(ctx context.Context, sel ast.SelectionSet, v *model.Block) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
-	return ec._BlockResponse(ctx, sel, v)
+	return ec._Block(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOBoolean2bool(ctx context.Context, v any) (bool, error) {
@@ -5225,6 +5582,13 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return res
 }
 
+func (ec *executionContext) marshalOLatestBlocksResponse2ᚖserverᚋgraphᚋmodelᚐLatestBlocksResponse(ctx context.Context, sel ast.SelectionSet, v *model.LatestBlocksResponse) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._LatestBlocksResponse(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v any) (*string, error) {
 	if v == nil {
 		return nil, nil
@@ -5241,11 +5605,11 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	return res
 }
 
-func (ec *executionContext) marshalOTransactionResponse2ᚖserverᚋgraphᚋmodelᚐTransactionResponse(ctx context.Context, sel ast.SelectionSet, v *model.TransactionResponse) graphql.Marshaler {
+func (ec *executionContext) marshalOTransaction2ᚖserverᚋgraphᚋmodelᚐTransaction(ctx context.Context, sel ast.SelectionSet, v *model.Transaction) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
-	return ec._TransactionResponse(ctx, sel, v)
+	return ec._Transaction(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {
