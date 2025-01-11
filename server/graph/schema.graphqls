@@ -5,6 +5,7 @@
 type Query {
   getBalanceByAddress(address: String!): BalanceResponse
   getTransactionByTxId(txId: String!): TransactionResponse
+  getBlockByHeight(height: Int!): BlockResponse
 }
 
 type BalanceResponse {
@@ -27,6 +28,27 @@ type TransactionResponse {
   time: Int!
   # vin: [Vin!]!
   # vout: [Vout!]!
+}
+
+type BlockResponse {
+  hash: String!
+  confirmations: Int!
+  size: Int!
+  strippedSize: Int!
+  weight: Int!
+  height: Int!
+  version: Int!
+  versionHex: String!
+  merkeRoot: String!
+  time: Int!
+  medianTime: Int!
+  nonce: Int!
+  bits: String!
+  difficulty: Float!
+  chainwork: String!
+  nTx: Int!
+  previousBlockHash: String!
+  nextBlockHash: String!
 }
 
 # type Mutation {

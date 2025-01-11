@@ -7,6 +7,27 @@ type BalanceResponse struct {
 	Balance int32  `json:"balance"`
 }
 
+type BlockResponse struct {
+	Hash              string  `json:"hash"`
+	Confirmations     int32   `json:"confirmations"`
+	Size              int32   `json:"size"`
+	StrippedSize      int32   `json:"strippedSize"`
+	Weight            int32   `json:"weight"`
+	Height            int32   `json:"height"`
+	Version           int32   `json:"version"`
+	VersionHex        string  `json:"versionHex"`
+	MerkeRoot         string  `json:"merkeRoot"`
+	Time              int32   `json:"time"`
+	MedianTime        int32   `json:"medianTime"`
+	Nonce             int32   `json:"nonce"`
+	Bits              string  `json:"bits"`
+	Difficulty        float64 `json:"difficulty"`
+	Chainwork         string  `json:"chainwork"`
+	NTx               int32   `json:"nTx"`
+	PreviousBlockHash string  `json:"previousBlockHash"`
+	NextBlockHash     string  `json:"nextBlockHash"`
+}
+
 type Query struct {
 }
 

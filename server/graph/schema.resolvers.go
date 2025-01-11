@@ -72,6 +72,55 @@ func (r *queryResolver) GetTransactionByTxID(ctx context.Context, txID string) (
 	return (*model.TransactionResponse)(&response.Result), nil
 }
 
+// GetBlockByHeight is the resolver for the getBlockByHeight field.
+func (r *queryResolver) GetBlockByHeight(ctx context.Context, height int32) (*model.BlockResponse, error) {
+	client := rpc.NewRpcClient()
+
+	// First get the block hash for the given height
+	var blockHashResponse struct {
+		Result string      `json:"result"`
+		Error  interface{} `json:"error"`
+	}
+
+	err := client.Call("getblockhash", []interface{}{height}, &blockHashResponse)
+	if err != nil {
+		return nil, fmt.Errorf("RPC call failed: %v", err)
+	}
+
+	fmt.Println("Block hash:", blockHashResponse.Result)
+
+	var blockResponse struct {
+		Result struct {
+			Hash              string  `json:"hash"`
+			Confirmations     int32   `json:"confirmations"`
+			Size              int32   `json:"size"`
+			StrippedSize      int32   `json:"strippedsize"`
+			Weight            int32   `json:"weight"`
+			Height            int32   `json:"height"`
+			Version           int32   `json:"version"`
+			VersionHex        string  `json:"versionHex"`
+			MerkeRoot         string  `json:"merkeRoot"`
+			Time              int32   `json:"time"`
+			MedianTime        int32   `json:"mediantime"`
+			Nonce             int32   `json:"nonce"`
+			Bits              string  `json:"bits"`
+			Difficulty        float64 `json:"difficulty"`
+			Chainwork         string  `json:"chainwork"`
+			NTx               int32   `json:"nTx"`
+			PreviousBlockHash string  `json:"previousblockhash"`
+			NextBlockHash     string  `json:"nextblockhash"`
+		} `json:"result"`
+		Error interface{} `json:"error"`
+	}
+
+	err = client.Call("getblock", []interface{}{blockHashResponse.Result, 1}, &blockResponse)
+	if err != nil {
+		return nil, fmt.Errorf("RPC call failed: %v", err)
+	}
+
+	return (*model.BlockResponse)(&blockResponse.Result), nil
+}
+
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
