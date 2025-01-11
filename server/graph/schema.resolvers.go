@@ -42,6 +42,36 @@ func (r *queryResolver) GetBalanceByAddress(ctx context.Context, address string)
 	}, nil
 }
 
+// GetTransactionByTxID is the resolver for the getTransactionByTxId field.
+func (r *queryResolver) GetTransactionByTxID(ctx context.Context, txID string) (*model.TransactionResponse, error) {
+	client := rpc.NewRpcClient()
+
+	var response struct {
+		Result struct {
+			Hex           string `json:"hex"`
+			TxID          string `json:"txId"`
+			Hash          string `json:"hash"`
+			Size          int32  `json:"size"`
+			Vsize         int32  `json:"vsize"`
+			Weight        int32  `json:"weight"`
+			Version       int32  `json:"version"`
+			Locktime      int32  `json:"locktime"`
+			BlockHash     string `json:"blockHash"`
+			Confirmations int32  `json:"confirmations"`
+			BlockTime     int32  `json:"blockTime"`
+			Time          int32  `json:"time"`
+		} `json:"result"`
+		Error interface{} `json:"error"`
+	}
+
+	err := client.Call("getrawtransaction", []interface{}{txID, 1}, &response)
+	if err != nil {
+		return nil, fmt.Errorf("RPC call failed: %v", err)
+	}
+
+	return (*model.TransactionResponse)(&response.Result), nil
+}
+
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 

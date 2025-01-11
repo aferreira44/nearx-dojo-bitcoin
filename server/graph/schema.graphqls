@@ -2,21 +2,9 @@
 #
 # https://gqlgen.com/getting-started/
 
-# type Todo {
-#   id: ID!
-#   text: String!
-#   done: Boolean!
-#   user: User!
-# }
-
-# type User {
-#   id: ID!
-#   name: String!
-# }
-
 type Query {
-  # todos: [Todo!]!
   getBalanceByAddress(address: String!): BalanceResponse
+  getTransactionByTxId(txId: String!): TransactionResponse
 }
 
 type BalanceResponse {
@@ -24,10 +12,22 @@ type BalanceResponse {
   balance: Int!
 }
 
-# input NewTodo {
-#   text: String!
-#   userId: String!
-# }
+type TransactionResponse {
+  hex: String!
+  txId: String!
+  hash: String!
+  size: Int!
+  vsize: Int!
+  weight: Int!
+  version: Int!
+  locktime: Int!
+  blockHash: String!
+  confirmations: Int!
+  blockTime: Int!
+  time: Int!
+  # vin: [Vin!]!
+  # vout: [Vout!]!
+}
 
 # type Mutation {
 #   createTodo(input: NewTodo!): Todo!

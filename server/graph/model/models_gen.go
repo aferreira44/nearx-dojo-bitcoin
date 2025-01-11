@@ -9,3 +9,18 @@ type BalanceResponse struct {
 
 type Query struct {
 }
+
+type TransactionResponse struct {
+	Hex           string `json:"hex"`
+	TxID          string `json:"txId"`
+	Hash          string `json:"hash"`
+	Size          int32  `json:"size"`
+	Vsize         int32  `json:"vsize"`
+	Weight        int32  `json:"weight"`
+	Version       int32  `json:"version"`
+	Locktime      int32  `json:"locktime"`
+	BlockHash     string `json:"blockHash"`
+	Confirmations int32  `json:"confirmations"`
+	BlockTime     int32  `json:"blockTime"`
+	Time          int32  `json:"time"`
+}
