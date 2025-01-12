@@ -19,7 +19,7 @@ func (r *queryResolver) GetLatestBlocks(ctx context.Context, count int32) (*mode
 		Result struct {
 			Blocks int32 `json:"blocks"`
 		} `json:"result"`
-		Error interface{} `json:"error"`
+		Error rpc.RPCError `json:"error"`
 	}
 
 	err := client.Call("getblockchaininfo", []interface{}{}, &blockchainInfoResponse)
@@ -33,9 +33,15 @@ func (r *queryResolver) GetLatestBlocks(ctx context.Context, count int32) (*mode
 
 	for i := latestBlockHeight; i > latestBlockHeight-int32(count); i-- {
 		block, err := r.GetBlockByHeight(ctx, i)
+
 		if err != nil {
 			return nil, fmt.Errorf("failed to get block by height: %v", err)
 		}
+
+		if block == nil {
+			break
+		}
+
 		blocks = append(blocks, block)
 	}
 
@@ -50,7 +56,7 @@ func (r *queryResolver) GetBalanceByAddress(ctx context.Context, address string)
 		Result []struct {
 			Amount float64 `json:"amount"`
 		} `json:"result"`
-		Error interface{} `json:"error"`
+		Error rpc.RPCError `json:"error"`
 	}
 
 	err := client.Call("listunspent", []interface{}{0, 9999999, []string{address}}, &response)
@@ -92,10 +98,14 @@ func (r *queryResolver) GetTransactionByTxID(ctx context.Context, txID string) (
 			BlockTime     int32  `json:"blockTime"`
 			Time          int32  `json:"time"`
 		} `json:"result"`
-		Error interface{} `json:"error"`
+		Error rpc.RPCError `json:"error"`
 	}
 
 	err := client.Call("getrawtransaction", []interface{}{txID, 1}, &response)
+	if response.Error.Code == -5 {
+		return nil, fmt.Errorf("transaction not found: %s", txID)
+	}
+
 	if err != nil {
 		return nil, fmt.Errorf("RPC call failed: %v", err)
 	}
@@ -109,19 +119,22 @@ func (r *queryResolver) GetBlockByHeight(ctx context.Context, height int32) (*mo
 
 	// First get the block hash for the given height
 	var blockHashResponse struct {
-		Result string      `json:"result"`
-		Error  interface{} `json:"error"`
+		Result string       `json:"result"`
+		Error  rpc.RPCError `json:"error"`
 	}
 
 	err := client.Call("getblockhash", []interface{}{height}, &blockHashResponse)
+
+	if blockHashResponse.Error.Code == -8 {
+		return nil, fmt.Errorf("block not found: %d", height)
+	}
+
 	if err != nil {
 		return nil, fmt.Errorf("RPC call failed: %v", err)
 	}
 
-	fmt.Println("Block hash:", blockHashResponse.Result)
-
 	var blockResponse struct {
-		Result struct {
+		Result struct { // TODO: Replace with model.Block
 			Hash              string  `json:"hash"`
 			Confirmations     int32   `json:"confirmations"`
 			Size              int32   `json:"size"`
@@ -141,7 +154,7 @@ func (r *queryResolver) GetBlockByHeight(ctx context.Context, height int32) (*mo
 			PreviousBlockHash string  `json:"previousblockhash"`
 			NextBlockHash     string  `json:"nextblockhash"`
 		} `json:"result"`
-		Error interface{} `json:"error"`
+		Error rpc.RPCError `json:"error"`
 	}
 
 	err = client.Call("getblock", []interface{}{blockHashResponse.Result, 1}, &blockResponse)
