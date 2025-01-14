@@ -9,6 +9,10 @@ on:
 
 env:
   AWS_REGION: us-east-1
+  ECS_CLUSTER: bitcoin-explorer-cluster
+  ECS_SERVICE: bitcoin-explorer-backend
+  ECS_TASK_DEFINITION: bitcoin-explorer-backend
+  CONTAINER_NAME: bitcoin-explorer-backend
 
 jobs:
   deploy:
@@ -40,31 +44,27 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
 
-      - name: Deploy to EC2
-        uses: appleboy/ssh-action@v1.0.3
+      - name: Download task definition
+        run: |
+          aws ecs describe-task-definition --task-definition ${{ env.ECS_TASK_DEFINITION }} \
+          --query taskDefinition > task-definition.json
+
+      - name: Update ECS task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          debug: true
-          script: |
-            # Login to ECR
-            aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ steps.login-ecr.outputs.registry }}
+          task-definition: task-definition.json
+          container-name: ${{ env.CONTAINER_NAME }}
+          image: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+          environment-variables: |
+            BITCOIN_NODE_URL=${{ secrets.BITCOIN_NODE_URL }}
+            BITCOIN_NODE_USER=${{ secrets.BITCOIN_NODE_USER }}
+            BITCOIN_NODE_PASS=${{ secrets.BITCOIN_NODE_PASS }}
 
-            # Pull latest image
-            docker pull ${{ steps.login-ecr.outputs.registry }}/bitcoin-explorer-backend:latest
-
-            # Stop and remove existing container
-            docker stop bitcoin-explorer-backend || true
-            docker rm bitcoin-explorer-backend || true
-
-            # Run new container
-            docker run -d \
-              --name bitcoin-explorer-backend \
-              --restart unless-stopped \
-              -p 8080:8080 \
-              -e PORT=8080 \
-              -e BITCOIN_NODE_URL=${{ secrets.BITCOIN_NODE_URL }} \
-              -e BITCOIN_NODE_USER=${{ secrets.BITCOIN_NODE_USER }} \
-              -e BITCOIN_NODE_PASS=${{ secrets.BITCOIN_NODE_PASS }} \
-              ${{ steps.login-ecr.outputs.registry }}/bitcoin-explorer-backend:latest
+      - name: Deploy to ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true
