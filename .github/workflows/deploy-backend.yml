@@ -47,18 +47,26 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            # Install AWS CLI if not present
+            which aws || (
+              curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+              unzip -q awscliv2.zip
+              sudo ./aws/install
+              rm -rf aws awscliv2.zip
+            )
+
             # Login to ECR
-            aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ steps.login-ecr.outputs.registry }}
+            aws ecr get-login-password --region ${{ env.AWS_REGION }} | sudo docker login --username AWS --password-stdin ${{ steps.login-ecr.outputs.registry }}
 
             # Pull latest image
-            docker pull ${{ steps.login-ecr.outputs.registry }}/bitcoin-explorer-backend:latest
+            sudo docker pull ${{ steps.login-ecr.outputs.registry }}/bitcoin-explorer-backend:latest
 
             # Stop and remove existing container
-            docker stop bitcoin-explorer-backend || true
-            docker rm bitcoin-explorer-backend || true
+            sudo docker stop bitcoin-explorer-backend || true
+            sudo docker rm bitcoin-explorer-backend || true
 
             # Run new container
-            docker run -d \
+            sudo docker run -d \
               --name bitcoin-explorer-backend \
               --restart unless-stopped \
               -p 8080:8080 \
