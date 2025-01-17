@@ -20,13 +20,13 @@ type RpcClient struct {
 func NewRpcClient() *RpcClient {
 	nodeURL := os.Getenv("BITCOIN_NODE_URL")
 	if nodeURL == "" {
-		nodeURL = "http://localhost:18443" // fallback
+		nodeURL = "http://54.227.3.21:18443" // fallback
 	}
 
 	return &RpcClient{
 		url:      nodeURL,
-		username: os.Getenv("BITCOIN_NODE_USER"),
-		password: os.Getenv("BITCOIN_NODE_PASS"),
+		username: "user",
+		password: "pass",
 		client:   &http.Client{},
 	}
 }
